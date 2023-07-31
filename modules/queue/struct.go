@@ -12,6 +12,8 @@ type queueSession struct {
 	SoftBlockUrl     string
 	EncodedChallenge string
 	id               string
+	apiKey           string
+	Delay            int
 }
 
 // queue struct

@@ -79,7 +79,7 @@ func (queue *queueSession) RotateProxy() error {
 	return nil
 }
 
-func InitQueue(taskFile string, successWh string, failedWh string) {
+func InitQueue(taskFile string, successWh string, failedWh string, apiKey string) {
 
 	webhookQueue := discord.StartQueue(10)
 	go webhookQueue.Run()
@@ -88,7 +88,7 @@ func InitQueue(taskFile string, successWh string, failedWh string) {
 
 	if err != nil {
 		log.Error(err.Error(), location)
-		time.Sleep(2 * time.Second)
+		time.Sleep(5 * time.Second)
 		os.Exit(0)
 	}
 
@@ -96,13 +96,13 @@ func InitQueue(taskFile string, successWh string, failedWh string) {
 
 	if err != nil {
 		log.Error(err.Error(), location)
-		time.Sleep(2 * time.Second)
+		time.Sleep(5 * time.Second)
 		os.Exit(0)
 	}
 
 	if err != nil {
 		log.Error(err.Error(), location)
-		time.Sleep(2 * time.Second)
+		time.Sleep(5 * time.Second)
 		os.Exit(0)
 	}
 
@@ -110,7 +110,7 @@ func InitQueue(taskFile string, successWh string, failedWh string) {
 
 	if err != nil {
 		log.Error(err.Error(), location)
-		time.Sleep(2 * time.Second)
+		time.Sleep(5 * time.Second)
 		os.Exit(0)
 	}
 
@@ -120,7 +120,7 @@ func InitQueue(taskFile string, successWh string, failedWh string) {
 
 	if err != nil {
 		log.Error("Error while reading the csv file!", location)
-		time.Sleep(2 * time.Second)
+		time.Sleep(5 * time.Second)
 		os.Exit(0)
 	}
 
@@ -130,7 +130,7 @@ func InitQueue(taskFile string, successWh string, failedWh string) {
 		rows = rows[1:]
 	} else {
 		log.Error("The csv is empty!", location)
-		time.Sleep(2 * time.Second)
+		time.Sleep(5 * time.Second)
 		os.Exit(0)
 	}
 
@@ -142,29 +142,30 @@ func InitQueue(taskFile string, successWh string, failedWh string) {
 		delay, err := strconv.Atoi(row[2])
 		if err != nil {
 			log.Error("Error while converting the delay!", location)
-			time.Sleep(2 * time.Second)
+			time.Sleep(5 * time.Second)
 			return
 		}
 		wg.Add(1)
-		go QueueModule(&wg, proxyArr, webhookQueue, successWh, row, log.PrettyId(i), delay)
+		go QueueModule(&wg, proxyArr, webhookQueue, successWh, row, log.PrettyId(i), delay, apiKey)
 	}
 
 	wg.Wait()
 
-	time.Sleep(15 * time.Second)
+	time.Sleep(30 * time.Second)
 	log.Success("All task has been completed!", location)
 }
 
-func QueueModule(wg *sync.WaitGroup, proxyArr []string, webhookQueue *discord.WebhookQueue, successWebhook string, row []string, id string, delay int) {
+func QueueModule(wg *sync.WaitGroup, proxyArr []string, webhookQueue *discord.WebhookQueue, successWebhook string, row []string, id string, delay int, apiKey string) {
 	defer wg.Done()
 
 	proxie, err := proxyManager.RandomProxy(proxyArr)
 	module, err := InitTls(proxie)
 	module.Proxy = proxie
+	module.apiKey = apiKey
 	module.id = id
 	if err != nil {
 		log.ErrorTask(err.Error(), location, id)
-		time.Sleep(2 * time.Second)
+		time.Sleep(time.Duration(delay) * time.Second)
 		os.Exit(0)
 	}
 
@@ -242,16 +243,8 @@ func QueueModule(wg *sync.WaitGroup, proxyArr []string, webhookQueue *discord.We
 	var challengeList []string
 
 	if queueInfo.CustomerID == "" || queueInfo.EventID == "" || queueInfo.QueueID == "" || queueInfo.TargetURL == "" || queueInfo.Culture == "" || queueInfo.Layout == "" {
-		log.ErrorTask("Softblocked!", location, id)
+		log.ErrorTask("Queue information not found!", location, id)
 		return
-		// module.QueueUrl = "https://footlocker.queue-it.net" + redirectUrl
-		// challengeList = append(challengeList, "BotDetect")
-		// queueInfo, err, redirectUrl = module.GetQueueChallenge()
-		// if err != nil {
-		// 	log.Error(err.Error(), location)
-		// 	return
-		// }
-		//fmt.Println(queueInfo)
 	}
 
 	for _, challenge := range queueInfo.Challenges {
@@ -281,13 +274,13 @@ func QueueModule(wg *sync.WaitGroup, proxyArr []string, webhookQueue *discord.We
 					log.ErrorTask("Error while waiting in queue!", location, id)
 					log.ErrorTask(err.Error(), location, id)
 				}
-				time.Sleep(4 * time.Second)
+				time.Sleep(time.Duration(delay) * time.Second)
 				continue
 			}
 
 			if redirectUrl == "" {
 				log.ErrorTask("No redirect URL has been found!", location, id)
-				time.Sleep(3 * time.Second)
+				time.Sleep(time.Duration(module.Delay) * time.Second)
 				continue
 			}
 
@@ -445,13 +438,13 @@ func QueueModule(wg *sync.WaitGroup, proxyArr []string, webhookQueue *discord.We
 					log.ErrorTask(err.Error(), location, id)
 				}
 			}
-			time.Sleep(4 * time.Second)
+			time.Sleep(time.Duration(module.Delay) * time.Second)
 			continue
 		}
 
 		if redirectUrl == "" {
 			log.ErrorTask("No redirect URL has been found!", location, id)
-			time.Sleep(3 * time.Second)
+			time.Sleep(time.Duration(module.Delay) * time.Second)
 			continue
 		}
 
@@ -743,7 +736,7 @@ func (queue *queueSession) SoftBlockStep(queueInfo QueueInfo) SoftChallengeRespo
 		captchaInfo, err := queue.GetCaptcha(queueInfo)
 		if err != nil {
 			log.Error(err.Error(), location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 
@@ -751,19 +744,19 @@ func (queue *queueSession) SoftBlockStep(queueInfo QueueInfo) SoftChallengeRespo
 		tempCaptcha, err := SolveCaptcha(captchaInfo.ImageBase64)
 		if err != nil {
 			log.Error(err.Error(), location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 
 		if strings.Contains(captchaResult, " ") {
 			log.Error("Error while solving the captcha!", location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 
 		if len(tempCaptcha) < 6 {
 			log.Error("Error while solving the captcha!", location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 
@@ -776,13 +769,13 @@ func (queue *queueSession) SoftBlockStep(queueInfo QueueInfo) SoftChallengeRespo
 		solveRes, err := queue.SolveSoftChallenge(softBlockInfo, queueInfo)
 		if err != nil {
 			log.Error(err.Error(), location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 
 		if solveRes.IsVerified != true {
 			log.Error("Error while submitting the captcha [Bad Captcha]!", location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 
@@ -802,7 +795,7 @@ func (queue *queueSession) PowStep(queueInfo QueueInfo) SubmitPowRes {
 		powChallengeTemp, err := queue.GetPowChallenge(queueInfo)
 		if err != nil {
 			log.Error(err.Error(), location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 
@@ -819,13 +812,13 @@ func (queue *queueSession) PowStep(queueInfo QueueInfo) SubmitPowRes {
 		powResTemp, err := queue.SolvePow(queueInfo, powChallenge)
 		if err != nil {
 			log.Error(err.Error(), location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 
 		if powResTemp.IsVerified != true {
 			log.Error("Error while solving pow challenge!", location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 		submitPowStatus = true
@@ -847,20 +840,20 @@ func (queue *queueSession) RecapInvisStep(queueInfo QueueInfo) SubmitRecapRes {
 		recapInfo, err := queue.GetRecaptcha(queueInfo)
 		if err != nil {
 			log.Error(err.Error(), location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 
 		tempCaptcha, err := queue.SubmitRecaptchaInv(queueInfo, recapInfo)
 		if err != nil {
 			log.Error(err.Error(), location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 
 		if tempCaptcha.IsVerified != true {
 			log.Error("Error while solving recaptcha! [NOT VERIFIED]", location)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(queue.Delay) * time.Second)
 			continue
 		}
 

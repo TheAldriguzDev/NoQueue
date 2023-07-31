@@ -125,7 +125,7 @@ func (queue *queueSession) SubmitRecaptchaInv(queueInfo QueueInfo, recapData Rec
 	log.Warn("Solving captcha...", location)
 
 	// Add user api key
-	client := captchasolver.Create2CapClient("ae5f40ecb8180449e9cbfce2c7c438b0")
+	client := captchasolver.Create2CapClient(queue.apiKey)
 
 	recapInfo := captchasolver.RecapStruct{
 		SiteKey: recapData.SiteKey,

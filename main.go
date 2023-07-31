@@ -93,7 +93,7 @@ func main() {
 			panic(err)
 		}
 
-		queue.InitQueue(taskFile, settingData.SuccessWh, settingData.FailedWh)
+		queue.InitQueue(taskFile, settingData.SuccessWh, settingData.FailedWh, settingData.TwoCap)
 		//skatedeluxe.InitialiseTasks(taskFile, settingData.SuccessWh, settingData.FailedWh)
 		break
 	case "Footlocker":

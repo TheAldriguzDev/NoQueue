@@ -121,5 +121,6 @@ func InitSkate(taskFile string, successWh string, failedWh string) {
 
 	// We create a WaitGroup to syncronize the gorouting
 	//var wg sync.WaitGroup
-
 }
+
+
