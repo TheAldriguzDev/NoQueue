@@ -1,4 +1,4 @@
-# Aldriguz AIO
+# NoQueue
 
 A Go framework originally built to add site-specific automation modules. The main implementation in this repository is a Queue-it handler; the other menu entries and the SkateDeluxe package are incomplete examples of how additional sites could be organized.
 
@@ -33,5 +33,3 @@ The program creates its runtime folders if they are missing. The local settings,
 - `packages/auth/`: Whop license validation using an environment-provided token.
 - `packages/captchaSolver/`: 2Captcha integration.
 - `packages/reader/`, `packages/proxy/`, and `packages/discord/`: local configuration, proxies, and webhook delivery.
-
-To add another site, create a module under `modules/`, register it in the selector, and connect its task loader in `main.go`. Do not commit real credentials or task data. If you publish a repository that previously contained secrets, use a new history and revoke those credentials before publishing.
