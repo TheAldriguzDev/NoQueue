@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/TheAldriguzDev/tienne_aio/packages/log"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/log"
 )
 
 type Folders []string
@@ -161,7 +161,7 @@ func ReadFolder(path string, fileType string) (string, error) {
 			time.Sleep(3 * time.Second)
 			log.ClearConsole()
 			log.PrintLogo()
-			log.Info("Bonsaio files manager", "Reader")
+			log.Info("Aldriguz AIO files manager", "Reader")
 			fmt.Println("")
 			continue
 		}

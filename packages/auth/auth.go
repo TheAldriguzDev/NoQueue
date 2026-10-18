@@ -2,11 +2,9 @@ package auth
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/TheAldriguzDev/tienne_aio/packages/encrypt"
-	"github.com/TheAldriguzDev/tienne_aio/packages/log"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/log"
 	"io"
 	"net/http"
 	"os"
@@ -29,25 +27,10 @@ func LoginClient(userKey string) (WhopResponse, error) {
 	client := http.Client{}
 	var userData WhopResponse
 
-	secretKeyBytes, err := base64.StdEncoding.DecodeString(encrypt.SecretKey)
-	if err != nil {
-		panic(err)
+	bearer := os.Getenv("WHOP_API_TOKEN")
+	if bearer == "" {
+		return userData, fmt.Errorf("WHOP_API_TOKEN is required for license validation")
 	}
-
-	secret_bearer := "X9l16e83DgkrysoBRdGdI5O04VIpHMOMjuStCYe4HvIxbrKeWEhLt2nQW8km/VD6ol/huDvdfjFpG0KjZcpglA=="
-	encryptedData, err := base64.StdEncoding.DecodeString(secret_bearer)
-	if err != nil {
-		panic(err)
-	}
-
-	// Decifra i dati
-	decryptedData, err := encrypt.DecryptAES(secretKeyBytes, encryptedData)
-	if err != nil {
-		panic(err)
-	}
-
-	// Converte il byte slice decifrato in una stringa
-	bearer := string(decryptedData)
 
 	if userKey == "" {
 		return userData, fmt.Errorf("No user key has been found!")

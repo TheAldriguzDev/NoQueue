@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/TheAldriguzDev/tienne_aio/packages/log"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/log"
 )
 
 type AvailableSites []string

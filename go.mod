@@ -1,4 +1,4 @@
-module github.com/TheAldriguzDev/tienne_aio
+module github.com/TheAldriguzDev/aldriguz_aio
 
 go 1.20
 

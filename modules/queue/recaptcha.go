@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 
-	captchasolver "github.com/TheAldriguzDev/tienne_aio/packages/captchaSolver"
-	"github.com/TheAldriguzDev/tienne_aio/packages/log"
+	captchasolver "github.com/TheAldriguzDev/aldriguz_aio/packages/captchaSolver"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/log"
 
 	http "github.com/bogdanfinn/fhttp"
 )

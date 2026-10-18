@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TheAldriguzDev/tienne_aio/packages/log"
-	proxyManager "github.com/TheAldriguzDev/tienne_aio/packages/proxy"
-	filereader "github.com/TheAldriguzDev/tienne_aio/packages/reader"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/log"
+	proxyManager "github.com/TheAldriguzDev/aldriguz_aio/packages/proxy"
+	filereader "github.com/TheAldriguzDev/aldriguz_aio/packages/reader"
 
 	tls_client "github.com/bogdanfinn/tls-client"
 )

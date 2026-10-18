@@ -5,11 +5,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/TheAldriguzDev/tienne_aio/modules/queue"
-	"github.com/TheAldriguzDev/tienne_aio/packages/auth"
-	"github.com/TheAldriguzDev/tienne_aio/packages/log"
-	"github.com/TheAldriguzDev/tienne_aio/packages/modules"
-	filereader "github.com/TheAldriguzDev/tienne_aio/packages/reader"
+	"github.com/TheAldriguzDev/aldriguz_aio/modules/queue"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/auth"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/log"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/modules"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/protection"
+	filereader "github.com/TheAldriguzDev/aldriguz_aio/packages/reader"
 )
 
 var location = "Dashboard"
@@ -55,10 +56,7 @@ func main() {
 	userData, err := auth.LoginClient(settingData.License)
 
 	// We start checking if the user want to spoof our request
-	/*
-		REMEMBER TO ENABLE IT
-	*/
-	//go protection.GetProcess(settingData.License, userData.Discord.Username)
+	go protection.GetProcess(settingData.License, userData.Discord.Username)
 
 	if err != nil {
 		log.Error(err.Error(), location)
@@ -74,7 +72,7 @@ func main() {
 	//log.PrintLogo()
 
 	fmt.Println("")
-	log.Info("Welcome to Tienne AIO, "+userData.Discord.Username, location)
+	log.Info("Welcome to Aldriguz AIO, "+userData.Discord.Username, location)
 
 	// Now we have to select the site
 

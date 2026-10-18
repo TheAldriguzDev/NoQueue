@@ -14,8 +14,7 @@ import (
 	http "github.com/bogdanfinn/fhttp"
 )
 
-// pow id url is in: data-userid
-// <meta id="queue-it_log" data-userid="e39107e7-7f8a-4b25-95f3-4970ff5637ab" data-proxyurl="https://logging.queue-it.net/logging/event" data-assemblyversion="4.5.23.0" />
+// The proof-of-work user ID is read from the queue page metadata.
 
 // Structs
 type Parameters struct {

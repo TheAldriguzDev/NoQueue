@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/TheAldriguzDev/tienne_aio/packages/log"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/log"
 )
 
 var location string = "Discord"

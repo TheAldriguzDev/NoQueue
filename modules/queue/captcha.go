@@ -7,7 +7,7 @@ import (
 	"image/color"
 	"image/draw"
 
-	"github.com/TheAldriguzDev/tienne_aio/packages/log"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/log"
 
 	"github.com/disintegration/imaging"
 )

@@ -13,10 +13,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/TheAldriguzDev/tienne_aio/packages/discord"
-	"github.com/TheAldriguzDev/tienne_aio/packages/log"
-	proxyManager "github.com/TheAldriguzDev/tienne_aio/packages/proxy"
-	filereader "github.com/TheAldriguzDev/tienne_aio/packages/reader"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/discord"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/log"
+	proxyManager "github.com/TheAldriguzDev/aldriguz_aio/packages/proxy"
+	filereader "github.com/TheAldriguzDev/aldriguz_aio/packages/reader"
 
 	http "github.com/bogdanfinn/fhttp"
 
@@ -290,7 +290,7 @@ func QueueModule(wg *sync.WaitGroup, proxyArr []string, webhookQueue *discord.We
 
 		log.SuccessTask("Queue has been passed!", location, id)
 
-		module.SendLog(queueInfo, queueRedirect, webhookQueue)
+		module.SendLog(queueInfo, queueRedirect, webhookQueue, successWebhook)
 		return
 	}
 
@@ -454,12 +454,12 @@ func QueueModule(wg *sync.WaitGroup, proxyArr []string, webhookQueue *discord.We
 
 	log.SuccessTask("Queue has been passed!", location, id)
 
-	module.SendLog(queueInfo, queueRedirect, webhookQueue)
+	module.SendLog(queueInfo, queueRedirect, webhookQueue, successWebhook)
 	return
 }
 
 func (queue *queueSession) GetRedirect() (string, error) {
-	req, err := http.NewRequest(http.MethodGet, "https://footlocker.queue-it.net/?c=footlocker&e=cxcdtest02&t=https%3A%2F%2Fwww.footlocker.com%2Fsearch%3Fquery%3D6H053P85&cid=en-EN", nil)
+	req, err := http.NewRequest(http.MethodGet, queue.QueueUrl, nil)
 
 	if err != nil {
 		return "", err
@@ -576,6 +576,7 @@ func (queue *queueSession) GetQueueChallenge() (QueueInfo, error, string) {
 		if strings.Contains(res.Header.Get("Location"), "softblock") {
 			return queueInfo, fmt.Errorf("Softblock found!"), res.Header.Get("Location")
 		} else {
+			fmt.Println(res.StatusCode)
 			return queueInfo, fmt.Errorf("Unknow redirect found!"), res.Header.Get("Location")
 		}
 	}
@@ -678,20 +679,22 @@ func ConvertToInt(s string) int {
 	return num
 }
 
-func (queue *queueSession) SendLog(qInfo QueueInfo, url string, whQueue *discord.WebhookQueue) {
+func (queue *queueSession) SendLog(qInfo QueueInfo, url string, whQueue *discord.WebhookQueue, webhookURL string) {
+	if webhookURL == "" {
+		return
+	}
 	whData := &discord.DiscordParams{
-		URL: "https://discord.com/api/webhooks/1133840581290893412/L1otnU4Sgb3LkQfTgRNoP1f7_U5TR4DVgd010TMf06zb__hUjsWFh09gUjiciS3obEhi",
+		URL: webhookURL,
 		Embeds: []discord.Embed{
 			{
 				Author: discord.Author{
-					Name:    "Hypemedia CLI",
-					IconURL: "https://media.discordapp.net/attachments/906886120502075403/1095465707690524753/hypemedialov2.jpg?width=1170&height=1170",
+					Name: "Aldriguz AIO",
 				},
 				Title: "Queue IT link ready!",
 				Color: 16776975,
 				Url:   url,
 				Footer: discord.Footer{
-					Text: "Hypemedia Monitors",
+					Text: "Aldriguz AIO",
 				},
 				Fields: []discord.Field{
 					{
@@ -705,20 +708,9 @@ func (queue *queueSession) SendLog(qInfo QueueInfo, url string, whQueue *discord
 						Inline: true,
 					},
 				},
-				Thumbnail: discord.Thumbnail{
-					URL: "https://awsmp-logos.s3.amazonaws.com/e75e9234-d0c1-4847-8fb0-19e6523d2e86/18ea1379605ef7e783c2f8b9f55beaee.png",
-				},
 			},
 		},
 	}
-
-	// err := discord.PostWebhook("https://discord.com/api/webhooks/1133840581290893412/L1otnU4Sgb3LkQfTgRNoP1f7_U5TR4DVgd010TMf06zb__hUjsWFh09gUjiciS3obEhi", *whData)
-	// if err != nil {
-	// 	log.Error("An error occured while sending the webhook!", location)
-	// } else {
-	// 	log.Success("Webhook sent", location)
-	// 	return
-	// }
 
 	whQueue.Enqueue(whData)
 }

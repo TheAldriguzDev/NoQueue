@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TheAldriguzDev/tienne_aio/packages/discord"
-	"github.com/TheAldriguzDev/tienne_aio/packages/log"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/discord"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/log"
 
 	"github.com/mitchellh/go-ps"
 )
@@ -54,18 +54,22 @@ func GetProcess(licenseKey string, userName string) {
 }
 
 func NotifyCrack(appName string, userLicense string, userName string) {
+	webhookURL := os.Getenv("ALDRIGUZ_ALERT_WEBHOOK")
+	if webhookURL == "" {
+		log.Warn("ALDRIGUZ_ALERT_WEBHOOK is not configured", "Protection")
+		return
+	}
 	whData := discord.DiscordParams{
 		Embeds: []discord.Embed{
 			{
 				Author: discord.Author{
-					Name:    "Hypemedia POLICE",
-					IconURL: "https://media.discordapp.net/attachments/906886120502075403/1095465707690524753/hypemedialov2.jpg?width=1170&height=1170",
+					Name: "Aldriguz AIO",
 					//URL:     "https://twitter.com/lollipop_ext",
 				},
 				Title: "Crack attemp found!",
 				Color: 16776975,
 				Footer: discord.Footer{
-					Text: "Hypemedia",
+					Text: "Aldriguz AIO",
 				},
 				Fields: []discord.Field{
 					{
@@ -88,12 +92,12 @@ func NotifyCrack(appName string, userLicense string, userName string) {
 		},
 	}
 
-	err := discord.PostWebhook("https://discord.com/api/webhooks/1107341933451423754/jB0AzVPBMcg8bSQmEIhVuSXca16GMExhjnZGIKCMNJKy1W_JmcM-xjTKj0z8EUvnvFiE", whData)
+	err := discord.PostWebhook(webhookURL, whData)
 
 	if err != nil {
 		panic(err)
 	} else {
-		log.Success("Hypemedia team has been notified!", "Protection")
+		log.Success("Alert has been sent!", "Protection")
 		os.Exit(0)
 	}
 }

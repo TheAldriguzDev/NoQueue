@@ -3,7 +3,7 @@ package captchasolver
 import (
 	"time"
 
-	"github.com/TheAldriguzDev/tienne_aio/packages/log"
+	"github.com/TheAldriguzDev/aldriguz_aio/packages/log"
 
 	api2captcha "github.com/2captcha/2captcha-go"
 )
